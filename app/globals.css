@@ -1,0 +1,304 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #f4efe7;
+  --paper-2: #eee8dd;
+  --card: #f0eae0;
+  --ink: #1c1a17;
+  --ink-soft: #6b665d;
+  --ink-faint: #a29c90;
+  --rust: #be4a2b;
+  --rust-soft: rgba(190, 74, 43, 0.09);
+  --green: #3f8f5b;
+  --line: rgba(28, 26, 23, 0.13);
+  --line-soft: rgba(28, 26, 23, 0.07);
+  --shadow: 0 1px 2px rgba(28, 26, 23, 0.04);
+  --pad: clamp(1.25rem, 5vw, 4rem);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: var(--rust);
+    color: var(--paper);
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--rust);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-inline: var(--pad);
+  }
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+  .section {
+    padding-block: clamp(4.5rem, 9vw, 8.5rem);
+    position: relative;
+  }
+  .rule {
+    height: 1px;
+    background: var(--line);
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.4fr);
+    gap: clamp(2rem, 6vw, 5rem);
+  }
+  .rail {
+    position: sticky;
+    top: 7rem;
+    align-self: start;
+  }
+  .rail h2 {
+    font-family: var(--font-fraunces), serif;
+    font-weight: 400;
+    font-size: clamp(2.1rem, 4vw, 3.3rem);
+    line-height: 1.04;
+    margin-top: 0.9rem;
+  }
+  .rail p {
+    color: var(--ink-soft);
+    margin-top: 1.2rem;
+    max-width: 30ch;
+    font-size: 1rem;
+  }
+
+  /* chips & pills */
+  .chip {
+    font-size: 0.86rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.4rem 0.85rem;
+    color: var(--ink-soft);
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .chip:hover {
+    border-color: var(--rust);
+    color: var(--rust);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .pill {
+    font-size: 0.82rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .pill.accent {
+    background: var(--rust-soft);
+    border-color: transparent;
+    color: var(--rust);
+    font-weight: 500;
+  }
+  .micro-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 1.6rem 0 0.9rem;
+  }
+
+  /* timeline */
+  .timeline {
+    position: relative;
+    padding-left: 2.2rem;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 1px;
+    background: var(--line);
+  }
+  .job {
+    position: relative;
+    padding-bottom: 3rem;
+  }
+  .job:last-child {
+    padding-bottom: 0;
+  }
+  .job::before {
+    content: "";
+    position: absolute;
+    left: -2.2rem;
+    top: 0.45rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--ink-faint);
+  }
+  .job.current::before {
+    background: var(--rust);
+    border-color: var(--rust);
+  }
+  .bullets {
+    list-style: none;
+    margin: 1.2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0;
+  }
+  .bullets li {
+    position: relative;
+    padding-left: 1.3rem;
+    color: var(--ink-soft);
+  }
+  .bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--rust);
+  }
+
+  /* diagram */
+  .diagram {
+    background: #211e1a;
+    border-radius: 14px;
+    padding: clamp(1.3rem, 3vw, 2rem);
+    box-shadow: var(--shadow);
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.9rem;
+  }
+  .diagram .dlabel {
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6f6a60;
+    margin-bottom: 0.3rem;
+  }
+  .drow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .node {
+    font-size: 0.8rem;
+    color: #e9e2d5;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 7px;
+    padding: 0.4rem 0.7rem;
+    white-space: nowrap;
+  }
+  .node.hl {
+    background: var(--rust);
+    border-color: var(--rust);
+    color: #fff;
+  }
+  .arrow {
+    color: #6f6a60;
+    font-size: 0.9rem;
+  }
+
+  /* contact rows */
+  .crow {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.3rem 0.2rem;
+    border-bottom: 1px solid var(--line);
+    transition: padding 0.25s, background 0.25s;
+  }
+  .crow:hover {
+    padding-left: 1.1rem;
+  }
+  .crow .lab {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    width: 6.5rem;
+    flex-shrink: 0;
+  }
+  .crow .val {
+    font-size: 1.15rem;
+  }
+  .crow .ar {
+    margin-left: auto;
+    color: var(--ink-faint);
+    transition: transform 0.25s, color 0.25s;
+  }
+  .crow:hover .ar {
+    transform: translate(3px, -3px);
+    color: var(--rust);
+  }
+
+  /* reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}
+
+@media (max-width: 860px) {
+  .split {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .rail {
+    position: static;
+  }
+}
+
