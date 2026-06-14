@@ -5,7 +5,7 @@ export const profile = {
   name: { first: "Atul", last: "Yadav" },
   role: "Senior Software Engineer · Backend & AI Workflows",
   tagline:
-    "Designing , Building and Scaling distributed backend systems and AI-powered workflows, cloud-native microservices — for global enterprises.",
+    "Designing, building and scaling distributed backend systems and AI-powered workflows — cloud-native microservices, event-driven pipelines, and agentic automation — for global enterprises.",
   location: "Pune, India",
   openToWork: true,
   email: "atuljnv02@gmail.com",
@@ -103,7 +103,7 @@ export const jobs: Job[] = [
       "Integrated Kafka async messaging across 5+ microservices for higher throughput and fault tolerance.",
       "Optimized secure access via Apache Guacamole, reducing login latency by 85%.",
     ],
-    tech: ["Spring Boot", "FastAPI", "Kafka", "Apache Guacamole", "Microservices"],
+    tech: ["Java", "Spring Boot", "Python", "FastAPI", "PostgreSQL", "Redis", "Kafka", "Apache Guacamole"],
   },
   {
     company: "KPIT Technologies",
@@ -181,14 +181,14 @@ export const projects: Project[] = [
     ],
   },
   {
-    kind: "Event-Driven Backend",
+    kind: "Event-Driven Backend · Observability",
     title: "Kafka Pipeline & Observability",
     description:
-      "Partition-based throttling for Kafka consumers processing ~30k events/day, paired with Redis caching, DLQ alerting, and Grafana dashboards across 20+ metrics — engineered to stay stable through peak traffic.",
+      "A production event-streaming backbone wiring 5+ microservices (Spring Boot + FastAPI) across an automotive platform. Partition-based throttling with lag-monitored backpressure keeps ~30k daily events stable through peak traffic without dropping messages. A Redis caching layer sits in front of hot-path lookups, cutting p99 latency 35%. Failed messages route to a DLQ with automated alerting; Prometheus scrapes broker and consumer-group metrics into Grafana dashboards (20+ panels) for live lag, throughput and error tracking. Splunk aggregates service logs for correlation — together cutting incident detection time by 50%.",
     metrics: ["~30k events / day", "35% lower p99", "50% faster detection"],
-    tech: ["Kafka", "Redis", "Prometheus", "Grafana", "Splunk"],
+    tech: ["Java", "Spring Boot", "Python", "FastAPI", "Kafka", "Redis", "Prometheus", "Grafana", "Splunk"],
     context: "Enterprise · KPIT",
-    media: "./kafka-observability-flow.svg",
+    media: "/kafka-observability-flow.svg",
     diagramLabel: "Event pipeline & observability",
     diagram: [
       { nodes: [{ label: "Producers" }, { label: "→" }, { label: "Kafka · partitions", hl: true }, { label: "→" }, { label: "Consumers" }] },
@@ -220,12 +220,13 @@ export const sideProjects = [
 
 export const skillGroups = [
   { name: "Backend", color: "#BE4A2B", items: ["Java", "Spring Boot", "Hibernate", "Python", "FastAPI", "Flask", "REST APIs"] },
-  { name: "AI & LLM Workflows", color: "#1A7A6E", items: ["LangChain", "LangGraph", "RAG", "Vector Databases", "LLM Integration", "AI Agents"] },
-  { name: "Distributed Systems", color: "#3F8F5B", items: ["Kafka", "Event-Driven Architecture", "Concurrency Control"] },
-  { name: "Databases & Caching", color: "#D8A23B", items: ["PostgreSQL", "MongoDB", "Redis"] },
+  { name: "AI & LLM Workflows", color: "#1A7A6E", items: ["LangChain", "LangGraph", "RAG", "Vector Databases", "AI Agents", "GitHub Copilot", "Cursor", "Prompt Engineering"] },
+  { name: "Distributed Systems", color: "#3F8F5B", items: ["Kafka", "Event-Driven Architecture", "Concurrency Control", "Distributed Locking", "Throttling"] },
+  { name: "Scheduling & Admission", color: "#8B5CF6", items: ["Priority Queues", "Batch Admission", "TTL Reservations", "Saga Compensation", "Resource Reservation"] },
+  { name: "Databases & Caching", color: "#D8A23B", items: ["PostgreSQL", "MongoDB", "Redis", "Schema Design", "Query Optimization", "DB Migration"] },
   { name: "Cloud & DevOps", color: "#5B6DC4", items: ["AWS", "GCP", "Kubernetes", "Docker", "GitLab CI/CD", "Jenkins"] },
-  { name: "Observability", color: "#A45BC4", items: ["Prometheus", "Grafana", "Splunk"] },
-  { name: "Core", color: "#BE4A2B", items: ["System Design", "Scalability", "High Availability", "DSA"] },
+  { name: "Observability", color: "#A45BC4", items: ["Prometheus", "Grafana", "Splunk", "DLQ Monitoring", "Alerting"] },
+  { name: "Core", color: "#BE4A2B", items: ["System Design", "Scalability", "High Availability", "Fault Tolerance", "API Design", "DSA"] },
 ];
 
 export const languages = ["Java", "Python", "C++", "SQL"];
@@ -236,8 +237,8 @@ export const achievements = [
   { big: "1843", title: "CodeChef — 4★", sub: "Max rating" },
   { big: "#30", title: "CodeChef Starters 11", sub: "Global, of 8,000+" },
   { big: "4.2%", title: "LeetCode — Top percentile", sub: "Max rating 1875" },
-  { big: "99.68", title: "JEE Mains 2019 percentile", sub: "among 2M+ candidates" },
-  { big: "★", title: "Samsung Star Scholar", sub: "Merit scholarship" },
+  { big: "99.68", title: "JEE Mains 2019 percentile", sub: "among 1M+ candidates" },
+  { big: "★", title: "Samsung Star Scholar", sub: "Top JNV student · JEE Mains 2019" },
   { big: "Top", title: "Performer — multi-year", sub: "Company & org-level awards" },
 ];
 
