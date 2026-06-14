@@ -1,0 +1,184 @@
+<svg width="100%" viewBox="0 0 1000 560" role="img" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>Task Orchestration Engine — parallel agentic workflow with priority queue, Kafka streaming and artifact publishing</title>
+<desc>Tickets enter from JIRA through a prioritized P1/P2/P3 queue into a central orchestrator that schedules agents in parallel on an Azure cluster. Agents stream status, reports and artifact events over Kafka; generated artifacts are pushed to GitLab/GitHub and an Artifactory (S3/Nexus), while LangChain monitors and results return to the user dashboard.</desc>
+
+<style>
+  .bg { fill:#211e1a; }
+  .nfill { fill:rgba(255,255,255,0.045); stroke:rgba(255,255,255,0.12); stroke-width:1; }
+  .t  { font-family:ui-sans-serif,system-ui,sans-serif; fill:#e9e2d5; font-size:13.5px; font-weight:500; }
+  .ts { font-family:ui-sans-serif,system-ui,sans-serif; fill:#9a9286; font-size:11px; font-weight:400; }
+  .eyebrow { font-family:ui-sans-serif,system-ui,sans-serif; fill:#be4a2b; font-size:11px; font-weight:600; letter-spacing:0.22em; }
+  .zlabel { font-family:ui-sans-serif,system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.13em; }
+  .conn { fill:none; stroke:rgba(255,255,255,0.14); stroke-width:1; }
+  .conn-rust { fill:none; stroke:rgba(190,74,43,0.5); stroke-width:1.2; stroke-dasharray:5 6; }
+  .conn-green{ fill:none; stroke:rgba(63,143,91,0.55); stroke-width:1.2; stroke-dasharray:5 6; }
+  .conn-kfk  { fill:none; stroke:rgba(83,170,170,0.5); stroke-width:1.2; stroke-dasharray:4 5; }
+  .dash-flow { animation: dashmove 1s linear infinite; }
+  @keyframes dashmove { to { stroke-dashoffset:-22; } }
+  .ring { fill:none; stroke:#be4a2b; }
+  .pulse { animation: pulsering 3s ease-out infinite; }
+  @keyframes pulsering { 0%{ r:30; opacity:0.55;} 70%{ opacity:0;} 100%{ r:66; opacity:0;} }
+  .spin { animation: spin 9s linear infinite; transform-origin:428px 188px; }
+  @keyframes spin { to { transform:rotate(360deg);} }
+  .agentcard { animation: glow 4s ease-in-out infinite; }
+  @keyframes glow { 0%,100%{ stroke:rgba(255,255,255,0.12);} 50%{ stroke:rgba(190,74,43,0.6);} }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; } }
+</style>
+
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect class="bg" x="0" y="0" width="1000" height="560" rx="16"/>
+<rect x="1" y="1" width="998" height="558" rx="15" fill="none" stroke="rgba(255,255,255,0.06)"/>
+<text class="eyebrow" x="28" y="32">TASK ORCHESTRATION ENGINE</text>
+
+<!-- ================= CONNECTORS ================= -->
+<path class="conn" d="M93 118 V 98"  marker-end="url(#arrow)"/>
+<path class="conn" d="M93 176 V 162" marker-end="url(#arrow)"/>
+<path class="conn" d="M93 234 V 220" marker-end="url(#arrow)"/>
+<path class="conn-rust dash-flow" d="M158 256 C 168 256, 168 210, 178 210" marker-end="url(#arrow)"/>
+<!-- queue lanes -> orchestrator -->
+<path class="conn-rust dash-flow" d="M324 130 C 336 130, 332 178, 344 184" marker-end="url(#arrow)"/>
+<path class="conn-rust dash-flow" d="M324 200 H 344" marker-end="url(#arrow)"/>
+<path class="conn-rust dash-flow" d="M324 270 C 336 270, 332 222, 344 196" marker-end="url(#arrow)"/>
+<!-- orchestrator -> agents -->
+<path id="fa1" class="conn-rust dash-flow" d="M512 180 C 530 180, 538 123, 556 123" marker-end="url(#arrow)"/>
+<path id="fa2" class="conn-rust dash-flow" d="M512 195 C 532 195, 538 205, 556 205" marker-end="url(#arrow)"/>
+<path id="fa3" class="conn-rust dash-flow" d="M512 215 C 530 215, 538 288, 556 288" marker-end="url(#arrow)"/>
+<path id="fa4" class="conn-rust dash-flow" d="M512 230 C 528 230, 538 342, 556 342" marker-end="url(#arrow)"/>
+<!-- ci/cd -> artifacts -->
+<path id="ar1" class="conn-green dash-flow" d="M824 282 C 844 282, 846 195, 858 195" marker-end="url(#arrow)"/>
+<path id="ar2" class="conn-green dash-flow" d="M824 294 C 844 294, 846 271, 858 271" marker-end="url(#arrow)"/>
+<!-- agents -> kafka (producers) -->
+<path id="k1" class="conn-kfk dash-flow" d="M620 364 V 468" marker-end="url(#arrow)"/>
+<path id="k2" class="conn-kfk dash-flow" d="M700 364 V 468" marker-end="url(#arrow)"/>
+<path id="k3" class="conn-kfk dash-flow" d="M780 366 V 468" marker-end="url(#arrow)"/>
+<!-- kafka -> dashboard / langchain (consumers) -->
+<path id="kc1" class="conn-green dash-flow" d="M178 492 H 160" marker-end="url(#arrow)"/>
+<path id="kc2" class="conn-kfk dash-flow" d="M858 492 H 840" marker-start="url(#arrow)"/>
+<!-- dashboard -> web ui (results to user) -->
+<path id="ret" class="conn-green dash-flow" d="M93 468 C 93 360, 120 300, 110 162" marker-end="url(#arrow)"/>
+
+<!-- ================= INGESTION ================= -->
+<rect class="nfill" x="28" y="48" width="130" height="50" rx="9"/>
+<text class="t"  x="42" y="71">JIRA · ALM</text>
+<text class="ts" x="42" y="88">Ticket created</text>
+<rect class="nfill" x="28" y="118" width="130" height="44" rx="9"/>
+<text class="t" x="42" y="145">Web UI</text>
+<rect class="nfill" x="28" y="176" width="130" height="44" rx="9"/>
+<text class="t" x="42" y="203">API Gateway</text>
+<rect class="nfill" x="28" y="234" width="130" height="44" rx="9"/>
+<text class="t" x="42" y="261">Database</text>
+
+<!-- ================= PRIORITY QUEUE ================= -->
+<rect x="178" y="74" width="146" height="280" rx="11" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.13)"/>
+<text class="zlabel" x="192" y="98" style="fill:#9a9286;">PRIORITY QUEUE</text>
+<!-- P1 -->
+<text class="ts" x="192" y="124" style="fill:#be4a2b;font-weight:600;">P1 · high</text>
+<rect x="192" y="130" width="36" height="18" rx="4" fill="rgba(190,74,43,0.85)"/>
+<rect x="232" y="130" width="36" height="18" rx="4" fill="rgba(190,74,43,0.55)"/>
+<rect x="272" y="130" width="36" height="18" rx="4" fill="rgba(190,74,43,0.3)"/>
+<!-- P2 -->
+<text class="ts" x="192" y="194" style="fill:#d8a23b;font-weight:600;">P2 · med</text>
+<rect x="192" y="200" width="36" height="18" rx="4" fill="rgba(216,162,59,0.8)"/>
+<rect x="232" y="200" width="36" height="18" rx="4" fill="rgba(216,162,59,0.45)"/>
+<!-- P3 -->
+<text class="ts" x="192" y="264" style="fill:#9a9286;font-weight:600;">P3 · low</text>
+<rect x="192" y="270" width="36" height="18" rx="4" fill="rgba(255,255,255,0.28)"/>
+<rect x="232" y="270" width="36" height="18" rx="4" fill="rgba(255,255,255,0.16)"/>
+<rect x="272" y="270" width="36" height="18" rx="4" fill="rgba(255,255,255,0.1)"/>
+<text class="ts" x="192" y="318">FIFO within priority</text>
+
+<!-- ================= ORCHESTRATOR (HERO) ================= -->
+<rect x="344" y="120" width="168" height="196" rx="16" fill="rgba(190,74,43,0.13)" stroke="#be4a2b" stroke-width="1.5"/>
+<circle class="ring pulse" cx="428" cy="188" r="30" style="animation-delay:0s"/>
+<circle class="ring pulse" cx="428" cy="188" r="30" style="animation-delay:1.5s"/>
+<g class="spin"><circle cx="428" cy="188" r="40" fill="none" stroke="rgba(190,74,43,0.5)" stroke-width="1.5" stroke-dasharray="36 16"/></g>
+<circle cx="428" cy="188" r="23" fill="#be4a2b"/>
+<circle cx="428" cy="188" r="23" fill="none" stroke="rgba(255,255,255,0.35)"/>
+<text class="t" x="428" y="192" text-anchor="middle" style="fill:#fff;font-size:12px;">CORE</text>
+<text class="t"  x="428" y="248" text-anchor="middle" style="font-size:14.5px;">Orchestrator</text>
+<text class="ts" x="428" y="266" text-anchor="middle">Parallel scheduling · DAG</text>
+<text class="ts" x="428" y="282" text-anchor="middle">1-click Run All</text>
+<text class="ts" x="428" y="300" text-anchor="middle" style="fill:#be4a2b;">30+ concurrent tasks</text>
+
+<!-- ================= AZURE CLUSTER ================= -->
+<rect x="540" y="64" width="300" height="304" rx="14" fill="none" stroke="rgba(255,255,255,0.18)" stroke-dasharray="6 6"/>
+<text class="zlabel" x="556" y="84" style="fill:#7fb0c9;">AZURE KUBERNETES CLUSTER</text>
+
+<rect class="nfill agentcard" x="556" y="98" width="268" height="46" rx="10" style="animation-delay:0s"/>
+<text class="t"  x="570" y="120">Analyzer Agent</text>
+<text class="ts" x="570" y="136">Splits ticket &#8594; task list</text>
+
+<!-- parallel coding band -->
+<rect x="556" y="156" width="268" height="92" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.12)"/>
+<text class="ts" x="570" y="173" style="fill:#cdbfa0;font-weight:600;">Coding Agents · running in parallel</text>
+<g>
+  <path id="lane1" d="M576 191 H 804" fill="none"/>
+  <rect x="570" y="182" width="240" height="18" rx="4" fill="rgba(190,74,43,0.16)" stroke="rgba(190,74,43,0.4)"/>
+  <circle r="4" fill="#e0633f"><animateMotion dur="2s" repeatCount="indefinite"><mpath xlink:href="#lane1"/></animateMotion></circle>
+  <path id="lane2" d="M576 213 H 804" fill="none"/>
+  <rect x="570" y="204" width="240" height="18" rx="4" fill="rgba(190,74,43,0.16)" stroke="rgba(190,74,43,0.4)"/>
+  <circle r="4" fill="#e0633f"><animateMotion dur="2.6s" repeatCount="indefinite" begin="0.4s"><mpath xlink:href="#lane2"/></animateMotion></circle>
+  <path id="lane3" d="M576 235 H 804" fill="none"/>
+  <rect x="570" y="226" width="240" height="18" rx="4" fill="rgba(190,74,43,0.16)" stroke="rgba(190,74,43,0.4)"/>
+  <circle r="4" fill="#e0633f"><animateMotion dur="2.2s" repeatCount="indefinite" begin="0.9s"><mpath xlink:href="#lane3"/></animateMotion></circle>
+</g>
+
+<rect class="nfill" x="556" y="260" width="268" height="44" rx="10"/>
+<text class="t"  x="570" y="282">CI/CD Pipeline</text>
+<text class="ts" x="570" y="298">GitLab · Jenkins · auto-trigger</text>
+
+<rect x="556" y="320" width="268" height="44" rx="10" fill="rgba(216,162,59,0.08)" stroke="#d8a23b" stroke-dasharray="5 5"/>
+<text class="t"  x="570" y="342" style="fill:#e7c98a;">Human Workbench</text>
+<text class="ts" x="570" y="358" style="fill:#c5a45e;">Ephemeral · spun up on review</text>
+
+<!-- ================= ARTIFACTS ================= -->
+<rect class="nfill" x="858" y="170" width="118" height="50" rx="9"/>
+<text class="t"  x="870" y="192" style="font-size:12.5px;">GitLab/GitHub</text>
+<text class="ts" x="870" y="209">Code · MRs</text>
+<rect class="nfill" x="858" y="246" width="118" height="50" rx="9"/>
+<text class="t"  x="870" y="268">Artifactory</text>
+<text class="ts" x="870" y="285">S3 · Nexus</text>
+
+<!-- ================= KAFKA SPINE ================= -->
+<rect x="178" y="468" width="662" height="48" rx="10" fill="rgba(83,170,170,0.09)" stroke="rgba(83,170,170,0.5)"/>
+<line x1="300" y1="468" x2="300" y2="516" stroke="rgba(83,170,170,0.25)"/>
+<line x1="420" y1="468" x2="420" y2="516" stroke="rgba(83,170,170,0.25)"/>
+<line x1="540" y1="468" x2="540" y2="516" stroke="rgba(83,170,170,0.25)"/>
+<line x1="660" y1="468" x2="660" y2="516" stroke="rgba(83,170,170,0.25)"/>
+<line x1="760" y1="468" x2="760" y2="516" stroke="rgba(83,170,170,0.25)"/>
+<text class="t"  x="196" y="490" style="fill:#9fdede;">Kafka stream</text>
+<text class="ts" x="196" y="506" style="fill:#79b8b8;">status · reports · artifact events · partitioned</text>
+<g>
+  <path id="kflow" d="M830 492 H 188" fill="none"/>
+  <circle r="3.5" fill="#7fd4d4"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath xlink:href="#kflow"/></animateMotion></circle>
+  <circle r="3.5" fill="#7fd4d4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="0.8s"><mpath xlink:href="#kflow"/></animateMotion></circle>
+  <circle r="3.5" fill="#7fd4d4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="1.6s"><mpath xlink:href="#kflow"/></animateMotion></circle>
+</g>
+
+<!-- ================= DASHBOARD + LANGCHAIN ================= -->
+<rect class="nfill" x="28" y="468" width="130" height="48" rx="9"/>
+<text class="t"  x="42" y="490">Agent Dashboard</text>
+<text class="ts" x="42" y="506">Results &#8594; User</text>
+<rect x="858" y="468" width="118" height="48" rx="9" fill="rgba(63,143,91,0.1)" stroke="rgba(63,143,91,0.5)"/>
+<text class="t"  x="870" y="490" style="fill:#9ed9b3;">LangChain</text>
+<text class="ts" x="870" y="506" style="fill:#7bbf95;">Live monitor</text>
+
+<!-- ================= FLOW DOTS ================= -->
+<g>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.1s"><mpath xlink:href="#fa1"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.5s"><mpath xlink:href="#fa2"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.9s"><mpath xlink:href="#fa3"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.6s" repeatCount="indefinite" begin="1.3s"><mpath xlink:href="#fa4"/></animateMotion></circle>
+  <circle r="3" fill="#5bbd83"><animateMotion dur="1.5s" repeatCount="indefinite"><mpath xlink:href="#ar1"/></animateMotion></circle>
+  <circle r="3" fill="#5bbd83"><animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s"><mpath xlink:href="#ar2"/></animateMotion></circle>
+  <circle r="3" fill="#7fd4d4"><animateMotion dur="1.3s" repeatCount="indefinite"><mpath xlink:href="#k1"/></animateMotion></circle>
+  <circle r="3" fill="#7fd4d4"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.4s"><mpath xlink:href="#k2"/></animateMotion></circle>
+  <circle r="3" fill="#7fd4d4"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.8s"><mpath xlink:href="#k3"/></animateMotion></circle>
+  <circle r="3.5" fill="#5bbd83"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath xlink:href="#ret"/></animateMotion></circle>
+</g>
+</svg>

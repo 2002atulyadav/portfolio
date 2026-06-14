@@ -139,17 +139,19 @@ export type Project = {
   context: string;
   diagramLabel: string;
   diagram: DiagramRow[];
+  media?: string;
 };
 
 export const projects: Project[] = [
   {
-    kind: "Distributed Workflow System",
+    kind: "Distributed Workflow System · Agentic AI",
     title: "Task Orchestration Engine",
     description:
-      "A control plane that runs 30+ concurrent tasks with priority scheduling, queueing, polling, and graceful cancellation — bringing AI-driven automation, CI/CD agents, and human-in-the-loop steps under a single orchestrator.",
-    metrics: ["30+ concurrent tasks", "priority scheduling", "graceful cancellation"],
-    tech: ["Java", "Spring Boot", "Kafka", "Redis", "PostgreSQL"],
+      "An agentic control plane: a lead files a ticket in JIRA, an analyzer agent splits it into a task DAG, and specialized coding agents run in parallel on an Azure cluster. CI/CD pipelines and ephemeral human-review workbenches slot in as steps, all admitted by a P1/P2/P3 priority queue on a single Run. Status, reports, and artifact events stream over Kafka; generated artifacts are published to GitLab/GitHub and an Artifactory (S3/Nexus), with LangChain monitoring the agent workflows end to end.",
+    metrics: ["30+ concurrent tasks", "priority queue · DAG", "Kafka event streaming"],
+    tech: ["Java", "Spring Boot", "Python", "FastAPI", "Kafka", "Redis", "PostgreSQL", "Azure", "LangChain"],
     context: "Enterprise · KPIT",
+    media: "/orchestration-flow.svg",
     diagramLabel: "Orchestration control plane",
     diagram: [
       { nodes: [{ label: "AI Automation" }, { label: "CI/CD Agents" }, { label: "Human Tasks" }] },

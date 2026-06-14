@@ -49,7 +49,19 @@ export default function Work() {
             className="grid grid-cols-1 items-center gap-[clamp(1.6rem,4vw,3.5rem)] border-t border-line py-[clamp(2rem,4vw,3.2rem)] md:grid-cols-2"
           >
             <div className={i % 2 === 1 ? "md:order-2" : ""}>
-              <Diagram label={p.diagramLabel} rows={p.diagram} />
+              {p.media ? (
+                <div className="overflow-hidden rounded-[14px] shadow-sm">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.media}
+                    alt={`${p.title} — architecture workflow`}
+                    className="block w-full"
+                    loading="lazy"
+                  />
+                </div>
+              ) : (
+                <Diagram label={p.diagramLabel} rows={p.diagram} />
+              )}
             </div>
             <div>
               <div className="eyebrow mb-[0.9rem]">{p.kind}</div>
