@@ -52,8 +52,11 @@ export default function Education() {
           </div>
         </Reveal>
 
-        <Reveal className="col-span-full">
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      </div>
+
+      <div className="wrap mt-6">
+        <Reveal>
+          <div className="grid gap-4 sm:grid-cols-2">
             {schoolEducation.map((s) => (
               <div
                 key={s.level}

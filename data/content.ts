@@ -82,7 +82,9 @@ export const jobs: Job[] = [
     current: true,
     bullets: [
       "Architected a task orchestration engine running 30+ concurrent tasks with priority scheduling, queueing, polling, and graceful cancellation — unifying AI-driven automation, CI/CD agents, and human workflows.",
-      "Designed an enhanced package upload & job execution flow across 6 microservices — introducing early metadata normalization, batch license admission with atomic TTL reservations, resource capacity holds, partial scheduling with requeue, and a centralized status mapping service, replacing a fragile per-pipeline scheduling model.",
+      "Redesigned the end-to-end job execution pipeline across 6 microservices — normalized license & resource profiles at upload time (eliminating repeated DB lookups at queue time), introduced atomic batch admission with TTL reservations, partial scheduling with saga-pattern compensation, and a centralized status-mapping table; reduced scheduling overhead by removing per-pipeline config parsing from the hot path.",
+      "Built a batch license admission engine backed by a reservation ledger: groups pipelines by license-profile hash, computes max-runnable count via floor(available / required) under SERIALIZABLE isolation, and holds locks with a configurable TTL — replacing a single-pipeline lock model that degraded linearly under queue depth.",
+      "Designed a resource capacity admission layer (Python / FastAPI) with a batch-resource-check endpoint that evaluates CPU & RAM headroom across Kubernetes clusters with per-pipeline safety buffers, writes atomic resource reservations, and drives a 60 s reconciliation watchdog that self-heals expired or orphaned holds without operator intervention.",
       "Led database normalization and a large-scale migration across 10+ core tables with zero data loss, improving query performance by 30–40%.",
       "Implemented Redis caching across 5+ high-traffic services, cutting p99 latency ~35% and database load 40%+.",
       "Designed partition-based throttling for Kafka consumers processing ~30k events/day, stabilizing throughput at peak.",

@@ -32,7 +32,7 @@ export default function About() {
               alt={`${profile.name.first} ${profile.name.last}`}
               fill
               sizes="(max-width: 860px) 100vw, 50vw"
-              className="object-cover"
+              className="object-cover object-top"
               priority
             />
           </div>
