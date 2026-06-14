@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Atul Yadav — Technical Lead, Backend & Distributed Systems",
     description:
-      "Designing, Building and scaling distributed backend systems and cloud-native microservices for global enterprises.",
+      "Designing, Building and Scaling Distributed Backend Systems and Cloud-native Microservices for Global Enterprises.",
     type: "website",
   },
 };

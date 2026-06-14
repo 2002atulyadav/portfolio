@@ -5,7 +5,7 @@ export const profile = {
   name: { first: "Atul", last: "Yadav" },
   role: "Senior Software Engineer · Backend & AI Workflows",
   tagline:
-    "Designing and scaling event-driven backend systems and AI-powered workflows — LangChain, LangGraph, RAG pipelines, cloud-native microservices — for global enterprises.",
+    "Designing , Building and Scaling distributed backend systems and AI-powered workflows, cloud-native microservices — for global enterprises.",
   location: "Pune, India",
   openToWork: true,
   email: "atuljnv02@gmail.com",
@@ -188,6 +188,7 @@ export const projects: Project[] = [
     metrics: ["~30k events / day", "35% lower p99", "50% faster detection"],
     tech: ["Kafka", "Redis", "Prometheus", "Grafana", "Splunk"],
     context: "Enterprise · KPIT",
+    media: "./kafka-observability-flow.svg",
     diagramLabel: "Event pipeline & observability",
     diagram: [
       { nodes: [{ label: "Producers" }, { label: "→" }, { label: "Kafka · partitions", hl: true }, { label: "→" }, { label: "Consumers" }] },

@@ -1,0 +1,251 @@
+<svg width="100%" viewBox="0 0 1000 580" role="img" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>Kafka Pipeline and Observability — partition-based throttling, DLQ, Redis cache, Prometheus, Grafana, Splunk</title>
+<desc>Microservice producers publish events to a partitioned Kafka cluster with per-partition throttling. Consumer groups process in parallel; failed messages route to a DLQ. Redis caches hot lookups. Prometheus scrapes broker and consumer metrics into Grafana dashboards; Splunk aggregates logs; alerts fire on DLQ spikes and lag thresholds.</desc>
+
+<style>
+  .bg  { fill:#211e1a; }
+  .nf  { fill:rgba(255,255,255,0.045); stroke:rgba(255,255,255,0.12); stroke-width:1; }
+  .t   { font-family:ui-sans-serif,system-ui,sans-serif; fill:#e9e2d5; font-size:13px; font-weight:500; }
+  .ts  { font-family:ui-sans-serif,system-ui,sans-serif; fill:#9a9286; font-size:11px; font-weight:400; }
+  .eyebrow { font-family:ui-sans-serif,system-ui,sans-serif; fill:#be4a2b; font-size:11px; font-weight:600; letter-spacing:0.22em; }
+  .zl  { font-family:ui-sans-serif,system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:0.13em; }
+  .cr  { fill:none; stroke:rgba(190,74,43,0.52); stroke-width:1.2; stroke-dasharray:5 6; }
+  .ct  { fill:none; stroke:rgba(83,170,170,0.52); stroke-width:1.2; stroke-dasharray:4 5; }
+  .cg  { fill:none; stroke:rgba(63,143,91,0.58); stroke-width:1.2; stroke-dasharray:5 6; }
+  .ca  { fill:none; stroke:rgba(216,162,59,0.58); stroke-width:1.2; stroke-dasharray:4 5; }
+  .cp  { fill:none; stroke:rgba(160,120,210,0.55); stroke-width:1.2; stroke-dasharray:4 5; }
+  .df  { animation:dm 1s linear infinite; }
+  @keyframes dm { to { stroke-dashoffset:-22; } }
+  .pl  { animation:plr 3s ease-out infinite; fill:none; stroke:#be4a2b; }
+  @keyframes plr { 0%{r:14;opacity:0.6;} 70%{opacity:0;} 100%{r:32;opacity:0;} }
+  .gc  { animation:glw 3.5s ease-in-out infinite; }
+  @keyframes glw { 0%,100%{stroke:rgba(255,255,255,0.12);} 50%{stroke:rgba(190,74,43,0.5);} }
+  .sk  { animation:sk 0.9s ease-in-out infinite alternate; }
+  @keyframes sk { from{height:8px;y:20px;} to{height:28px;y:0px;} }
+  @media (prefers-reduced-motion:reduce){ *{ animation:none !important; } }
+</style>
+
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect class="bg" x="0" y="0" width="1000" height="580" rx="16"/>
+<rect x="1" y="1" width="998" height="578" rx="15" fill="none" stroke="rgba(255,255,255,0.06)"/>
+<text class="eyebrow" x="28" y="30">KAFKA PIPELINE AND OBSERVABILITY</text>
+
+<!-- legend -->
+<circle cx="428" cy="26" r="4" fill="#e0633f"/><text class="ts" x="438" y="30">events</text>
+<circle cx="502" cy="26" r="4" fill="#7fd4d4"/><text class="ts" x="512" y="30">metrics</text>
+<circle cx="590" cy="26" r="4" fill="#d8a23b"/><text class="ts" x="600" y="30">DLQ / alerts</text>
+<circle cx="700" cy="26" r="4" fill="#a078d2"/><text class="ts" x="710" y="30">logs</text>
+<circle cx="770" cy="26" r="4" fill="#5bbd83"/><text class="ts" x="780" y="30">cache hits</text>
+
+<!-- ============================================================
+     PRODUCERS
+============================================================ -->
+<rect class="nf" x="28" y="70" width="130" height="44" rx="9"/>
+<text class="t"  x="44" y="93">Pipeline Svc</text>
+<text class="ts" x="44" y="108">Spring Boot</text>
+
+<rect class="nf" x="28" y="130" width="130" height="44" rx="9"/>
+<text class="t"  x="44" y="153">Job Svc</text>
+<text class="ts" x="44" y="168">Spring Boot</text>
+
+<rect class="nf" x="28" y="190" width="130" height="44" rx="9"/>
+<text class="t"  x="44" y="213">License Svc</text>
+<text class="ts" x="44" y="228">FastAPI</text>
+
+<rect class="nf" x="28" y="250" width="130" height="44" rx="9"/>
+<text class="t"  x="44" y="273">Cloud Orch</text>
+<text class="ts" x="44" y="288">FastAPI</text>
+
+<!-- producer -> kafka paths -->
+<path id="p1" class="cr df" d="M158 92  C 178 92,  176 178, 196 178" marker-end="url(#arr)"/>
+<path id="p2" class="cr df" d="M158 152 C 176 152, 176 190, 196 190" marker-end="url(#arr)"/>
+<path id="p3" class="cr df" d="M158 212 C 176 212, 176 202, 196 202" marker-end="url(#arr)"/>
+<path id="p4" class="cr df" d="M158 272 C 178 272, 176 214, 196 214" marker-end="url(#arr)"/>
+
+<!-- ============================================================
+     KAFKA CLUSTER (hero)
+============================================================ -->
+<rect x="196" y="90" width="244" height="290" rx="14" fill="rgba(190,74,43,0.11)" stroke="#be4a2b" stroke-width="1.5"/>
+<text class="t"  x="318" y="114" text-anchor="middle" style="font-size:14px;">Kafka Cluster</text>
+<text class="ts" x="318" y="130" text-anchor="middle" style="fill:#be4a2b;">5 brokers · partitioned topics</text>
+<circle class="pl" cx="318" cy="114" r="14" style="animation-delay:0s"/>
+<circle class="pl" cx="318" cy="114" r="14" style="animation-delay:1.5s"/>
+
+<!-- partition lanes (3 topics) -->
+<text class="zl" x="210" y="155" style="fill:#9a9286;">TOPIC: pipeline.status</text>
+<rect x="210" y="160" width="216" height="16" rx="4" fill="rgba(190,74,43,0.22)" stroke="rgba(190,74,43,0.5)"/>
+<rect x="210" y="180" width="216" height="16" rx="4" fill="rgba(190,74,43,0.15)" stroke="rgba(190,74,43,0.35)"/>
+<rect x="210" y="200" width="216" height="16" rx="4" fill="rgba(190,74,43,0.10)" stroke="rgba(190,74,43,0.25)"/>
+<text class="ts" x="214" y="172" style="font-size:9.5px;fill:#e0633f;">P0</text>
+<text class="ts" x="214" y="192" style="font-size:9.5px;fill:#e0633f;">P1</text>
+<text class="ts" x="214" y="212" style="font-size:9.5px;fill:#e0633f;">P2</text>
+
+<text class="zl" x="210" y="235" style="fill:#9a9286;">TOPIC: job.events</text>
+<rect x="210" y="240" width="216" height="16" rx="4" fill="rgba(83,170,170,0.18)" stroke="rgba(83,170,170,0.4)"/>
+<rect x="210" y="260" width="216" height="16" rx="4" fill="rgba(83,170,170,0.12)" stroke="rgba(83,170,170,0.3)"/>
+<text class="ts" x="214" y="252" style="font-size:9.5px;fill:#7fd4d4;">P0</text>
+<text class="ts" x="214" y="272" style="font-size:9.5px;fill:#7fd4d4;">P1</text>
+
+<text class="zl" x="210" y="295" style="fill:#9a9286;">TOPIC: license.events</text>
+<rect x="210" y="300" width="216" height="16" rx="4" fill="rgba(63,143,91,0.18)" stroke="rgba(63,143,91,0.4)"/>
+<rect x="210" y="320" width="216" height="16" rx="4" fill="rgba(63,143,91,0.12)" stroke="rgba(63,143,91,0.3)"/>
+<text class="ts" x="214" y="312" style="font-size:9.5px;fill:#5bbd83;">P0</text>
+<text class="ts" x="214" y="332" style="font-size:9.5px;fill:#5bbd83;">P1</text>
+
+<text class="ts" x="318" y="360" text-anchor="middle" style="fill:#9a9286;">~30k events / day · partition throttle</text>
+<text class="ts" x="318" y="374" text-anchor="middle" style="fill:#be4a2b;">lag-based backpressure · offset commit</text>
+
+<!-- ============================================================
+     CONSUMER GROUPS
+============================================================ -->
+<rect x="480" y="90" width="164" height="200" rx="12" fill="none" stroke="rgba(255,255,255,0.16)" stroke-dasharray="6 6"/>
+<text class="zl" x="496" y="110" style="fill:#cdbfa0;">CONSUMER GROUPS</text>
+
+<rect class="nf gc" x="492" y="118" width="136" height="44" rx="8" style="animation-delay:0s"/>
+<text class="t"  x="506" y="136" style="font-size:12px;">Status Consumer</text>
+<text class="ts" x="506" y="151">3 instances · parallel</text>
+
+<rect class="nf gc" x="492" y="170" width="136" height="44" rx="8" style="animation-delay:1.2s"/>
+<text class="t"  x="506" y="188" style="font-size:12px;">Job Consumer</text>
+<text class="ts" x="506" y="203">2 instances · parallel</text>
+
+<rect class="nf gc" x="492" y="222" width="136" height="44" rx="8" style="animation-delay:2.4s"/>
+<text class="t"  x="506" y="240" style="font-size:12px;">License Consumer</text>
+<text class="ts" x="506" y="255">2 instances · parallel</text>
+
+<!-- kafka -> consumers -->
+<path id="k1" class="cr df" d="M440 178 H 492" marker-end="url(#arr)"/>
+<path id="k2" class="cr df" d="M440 250 C 464 250, 462 198, 492 195" marker-end="url(#arr)"/>
+<path id="k3" class="cr df" d="M440 312 C 464 312, 462 250, 492 248" marker-end="url(#arr)"/>
+
+<!-- ============================================================
+     DLQ
+============================================================ -->
+<rect x="480" y="318" width="164" height="52" rx="9" fill="rgba(216,162,59,0.1)" stroke="#d8a23b" stroke-width="1" stroke-dasharray="5 5"/>
+<text class="t"  x="494" y="340" style="fill:#e7c98a;font-size:12.5px;">Dead Letter Queue</text>
+<text class="ts" x="494" y="357" style="fill:#c5a45e;">retry · alert · inspect</text>
+
+<!-- consumers -> DLQ (failure path) -->
+<path id="dlq1" class="ca df" d="M560 290 V 318" marker-end="url(#arr)"/>
+
+<!-- ============================================================
+     REDIS CACHE
+============================================================ -->
+<rect class="nf" x="480" y="400" width="164" height="52" rx="9"/>
+<text class="t"  x="494" y="422" style="font-size:12.5px;">Redis Cache</text>
+<text class="ts" x="494" y="439">Hot state · 35% lower p99</text>
+
+<!-- consumers -> redis -->
+<path id="rc1" class="cg df" d="M560 370 V 400" marker-end="url(#arr)"/>
+
+<!-- ============================================================
+     OBSERVABILITY COLUMN
+============================================================ -->
+<!-- Prometheus -->
+<rect class="nf" x="694" y="90" width="152" height="60" rx="9"/>
+<text class="t"  x="710" y="116">Prometheus</text>
+<text class="ts" x="710" y="133">Scrapes broker · consumer lag</text>
+
+<!-- Grafana -->
+<rect x="694" y="172" width="152" height="60" rx="9" fill="rgba(190,74,43,0.10)" stroke="#be4a2b"/>
+<text class="t"  x="710" y="197">Grafana</text>
+<text class="ts" x="710" y="214" style="fill:#be4a2b;">20+ metrics · dashboards</text>
+
+<!-- Splunk -->
+<rect class="nf" x="694" y="254" width="152" height="60" rx="9"/>
+<text class="t"  x="710" y="279">Splunk</text>
+<text class="ts" x="710" y="296">Log aggregation · search</text>
+
+<!-- Alerts -->
+<rect x="694" y="336" width="152" height="60" rx="9" fill="rgba(216,162,59,0.1)" stroke="#d8a23b" stroke-dasharray="5 5"/>
+<text class="t"  x="710" y="361" style="fill:#e7c98a;">Alerting</text>
+<text class="ts" x="710" y="378" style="fill:#c5a45e;">DLQ spikes · lag threshold</text>
+
+<!-- kafka -> prometheus (metrics scrape) -->
+<path id="pm1" class="ct df" d="M440 140 C 570 140, 578 118, 694 118" marker-end="url(#arr)"/>
+<!-- consumers -> prometheus -->
+<path id="pm2" class="ct df" d="M644 140 C 664 140, 672 118, 694 118" marker-end="url(#arr)"/>
+<!-- prometheus -> grafana -->
+<path id="pg"  class="ct df" d="M770 150 V 172" marker-end="url(#arr)"/>
+<!-- consumers -> splunk (logs) -->
+<path id="sl1" class="cp df" d="M644 200 C 664 200, 674 282, 694 282" marker-end="url(#arr)"/>
+<!-- DLQ -> alerts -->
+<path id="al1" class="ca df" d="M644 344 C 672 344, 678 362, 694 362" marker-end="url(#arr)"/>
+<!-- grafana -> alerts feedback loop -->
+<path id="ga"  class="ca df" d="M770 232 V 336" marker-end="url(#arr)"/>
+
+<!-- ============================================================
+     ANIMATED FLOW DOTS
+============================================================ -->
+<g>
+  <!-- producers -> kafka -->
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.4s" repeatCount="indefinite" begin="0s"><mpath xlink:href="#p1"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.4s" repeatCount="indefinite" begin="0.35s"><mpath xlink:href="#p2"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.4s" repeatCount="indefinite" begin="0.7s"><mpath xlink:href="#p3"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.4s" repeatCount="indefinite" begin="1.05s"><mpath xlink:href="#p4"/></animateMotion></circle>
+  <!-- kafka -> consumers -->
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0s"><mpath xlink:href="#k1"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.4s"><mpath xlink:href="#k2"/></animateMotion></circle>
+  <circle r="3" fill="#e0633f"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.8s"><mpath xlink:href="#k3"/></animateMotion></circle>
+  <!-- DLQ -->
+  <circle r="3" fill="#d8a23b"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath xlink:href="#dlq1"/></animateMotion></circle>
+  <!-- redis cache -->
+  <circle r="3" fill="#5bbd83"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath xlink:href="#rc1"/></animateMotion></circle>
+  <!-- metrics -->
+  <circle r="3" fill="#7fd4d4"><animateMotion dur="2s" repeatCount="indefinite" begin="0s"><mpath xlink:href="#pm1"/></animateMotion></circle>
+  <circle r="3" fill="#7fd4d4"><animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s"><mpath xlink:href="#pm2"/></animateMotion></circle>
+  <circle r="3" fill="#7fd4d4"><animateMotion dur="1.3s" repeatCount="indefinite"><mpath xlink:href="#pg"/></animateMotion></circle>
+  <!-- logs -->
+  <circle r="3" fill="#a078d2"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath xlink:href="#sl1"/></animateMotion></circle>
+  <!-- alerts -->
+  <circle r="3" fill="#d8a23b"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath xlink:href="#al1"/></animateMotion></circle>
+  <circle r="3" fill="#d8a23b"><animateMotion dur="2s" repeatCount="indefinite" begin="0.3s"><mpath xlink:href="#ga"/></animateMotion></circle>
+</g>
+
+<!-- ============================================================
+     PARTITION LANE MOVING DOTS (inside Kafka)
+============================================================ -->
+<g>
+  <path id="lp0" d="M232 168 H 422" fill="none"/>
+  <path id="lp1" d="M232 188 H 422" fill="none"/>
+  <path id="lp2" d="M232 208 H 422" fill="none"/>
+  <path id="lj0" d="M232 248 H 422" fill="none"/>
+  <path id="lj1" d="M232 268 H 422" fill="none"/>
+  <path id="ll0" d="M232 308 H 422" fill="none"/>
+  <path id="ll1" d="M232 328 H 422" fill="none"/>
+  <circle r="2.5" fill="#e0633f" opacity="0.9"><animateMotion dur="1.1s" repeatCount="indefinite" begin="0s"><mpath xlink:href="#lp0"/></animateMotion></circle>
+  <circle r="2.5" fill="#e0633f" opacity="0.7"><animateMotion dur="1.5s" repeatCount="indefinite" begin="0.3s"><mpath xlink:href="#lp1"/></animateMotion></circle>
+  <circle r="2.5" fill="#e0633f" opacity="0.5"><animateMotion dur="1.9s" repeatCount="indefinite" begin="0.6s"><mpath xlink:href="#lp2"/></animateMotion></circle>
+  <circle r="2.5" fill="#7fd4d4" opacity="0.9"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.1s"><mpath xlink:href="#lj0"/></animateMotion></circle>
+  <circle r="2.5" fill="#7fd4d4" opacity="0.6"><animateMotion dur="1.7s" repeatCount="indefinite" begin="0.5s"><mpath xlink:href="#lj1"/></animateMotion></circle>
+  <circle r="2.5" fill="#5bbd83" opacity="0.9"><animateMotion dur="1.2s" repeatCount="indefinite" begin="0.2s"><mpath xlink:href="#ll0"/></animateMotion></circle>
+  <circle r="2.5" fill="#5bbd83" opacity="0.6"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.7s"><mpath xlink:href="#ll1"/></animateMotion></circle>
+</g>
+
+<!-- ============================================================
+     BOTTOM STATS BAR
+============================================================ -->
+<rect x="28" y="492" width="944" height="60" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)"/>
+<text class="t"  x="80"  y="518" text-anchor="middle" style="fill:#be4a2b;font-size:17px;">~30k</text>
+<text class="ts" x="80"  y="537" text-anchor="middle">events / day</text>
+<line x1="148" y1="500" x2="148" y2="544" stroke="rgba(255,255,255,0.1)"/>
+<text class="t"  x="228" y="518" text-anchor="middle" style="fill:#7fd4d4;font-size:17px;">35%</text>
+<text class="ts" x="228" y="537" text-anchor="middle">lower p99 latency</text>
+<line x1="308" y1="500" x2="308" y2="544" stroke="rgba(255,255,255,0.1)"/>
+<text class="t"  x="388" y="518" text-anchor="middle" style="fill:#5bbd83;font-size:17px;">20+</text>
+<text class="ts" x="388" y="537" text-anchor="middle">Grafana metrics</text>
+<line x1="468" y1="500" x2="468" y2="544" stroke="rgba(255,255,255,0.1)"/>
+<text class="t"  x="568" y="518" text-anchor="middle" style="fill:#d8a23b;font-size:17px;">50%</text>
+<text class="ts" x="568" y="537" text-anchor="middle">faster incident detection</text>
+<line x1="668" y1="500" x2="668" y2="544" stroke="rgba(255,255,255,0.1)"/>
+<text class="t"  x="748" y="518" text-anchor="middle" style="fill:#a078d2;font-size:17px;">5+</text>
+<text class="ts" x="748" y="537" text-anchor="middle">microservices wired</text>
+<line x1="828" y1="500" x2="828" y2="544" stroke="rgba(255,255,255,0.1)"/>
+<text class="t"  x="908" y="518" text-anchor="middle" style="fill:#e9e2d5;font-size:17px;">5</text>
+<text class="ts" x="908" y="537" text-anchor="middle">brokers · HA</text>
+</svg>

@@ -9,7 +9,7 @@ export default function About() {
         <Reveal className="rail">
           <div className="eyebrow">About</div>
           <h2 className="max-w-[18ch] font-display text-[clamp(2rem,4.4vw,3.5rem)] font-normal leading-[1.06] tracking-[-0.01em]">
-            I architect and scale distributed backend systems for global{" "}
+            I architect, build and scale distributed backend systems for global{" "}
             <span className="text-rust">enterprises.</span>
           </h2>
           <div className="mt-11 grid max-w-[30rem] grid-cols-2 gap-x-10 gap-y-8">
