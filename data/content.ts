@@ -168,7 +168,7 @@ export const projects: Project[] = [
       "A centralized device-management platform — think AWS IoT for automotive HIL — built entirely in Python/FastAPI. The control plane exposes a device registry, live health monitoring, staged OTA rollouts (canary → fleet with health-gated promotion), and a parallel test-campaign engine. Lightweight HIL agents run on desktop machines wired to real ECUs across EU, US, APAC, and ASIA. Devices stream telemetry asynchronously via async FastAPI I/O; test results are persisted to PostgreSQL and published as reports to Artifactory (S3/Nexus). Redis caches registry and health-state lookups to keep the real-time dashboard responsive under 1,000+ concurrent device streams. Secure remote access to hardware nodes is routed through Apache Guacamole — latency cut 85% after connection-pool optimization.",
     metrics: ["1,000+ devices", "4-region fleet", "85% lower access latency"],
     tech: ["Python", "FastAPI", "PostgreSQL", "Redis", "Kafka", "S3 · Nexus", "Apache Guacamole", "WebSocket"],
-    context: "Enterprise · KPIT · Mercedes-Benz · BMW · Ford",
+    context: "Enterprise · KPIT",
     media: "/hardware-manager-flow.svg",
     diagramLabel: "Multi-region platform",
     diagram: [
