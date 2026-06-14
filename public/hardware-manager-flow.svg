@@ -128,7 +128,7 @@
      REGION CARDS
 ============================================================ -->
 
-<!-- --- EU --- -->
+<!-- EU -->
 <rect x="488" y="100" width="486" height="102" rx="12" fill="none" stroke="rgba(255,255,255,0.18)" stroke-dasharray="6 6"/>
 <text class="zlabel" x="504" y="120" style="fill:#7fb0c9;">REGION · EU</text>
 <rect class="nfill" x="504" y="128" width="148" height="60" rx="8"/>
@@ -142,7 +142,7 @@
 <circle cx="848" cy="178" r="4" fill="#d8a23b" class="blink2"/>
 <path class="conn-teal dash-flow" d="M678 158 H 652" marker-start="url(#arrow)"/>
 
-<!-- --- US --- -->
+<!-- US -->
 <rect x="488" y="250" width="486" height="102" rx="12" fill="none" stroke="rgba(255,255,255,0.18)" stroke-dasharray="6 6"/>
 <text class="zlabel" x="504" y="270" style="fill:#7fb0c9;">REGION · US</text>
 <rect class="nfill" x="504" y="278" width="148" height="60" rx="8"/>
@@ -156,7 +156,7 @@
 <circle cx="848" cy="327" r="4" fill="#5bbd83" class="blink2"/>
 <path class="conn-teal dash-flow" d="M678 308 H 652" marker-start="url(#arrow)"/>
 
-<!-- --- APAC --- -->
+<!-- APAC -->
 <rect x="488" y="400" width="486" height="102" rx="12" fill="none" stroke="rgba(255,255,255,0.18)" stroke-dasharray="6 6"/>
 <text class="zlabel" x="504" y="420" style="fill:#7fb0c9;">REGION · APAC</text>
 <rect class="nfill" x="504" y="428" width="148" height="60" rx="8"/>
@@ -170,7 +170,7 @@
 <circle cx="848" cy="477" r="4" fill="#5bbd83" class="blink2"/>
 <path class="conn-green dash-flow" d="M678 458 H 652" marker-start="url(#arrow)"/>
 
-<!-- --- ASIA --- -->
+<!-- ASIA -->
 <rect x="488" y="520" width="486" height="102" rx="12" fill="none" stroke="rgba(255,255,255,0.18)" stroke-dasharray="6 6"/>
 <text class="zlabel" x="504" y="540" style="fill:#7fb0c9;">REGION · ASIA</text>
 <rect class="nfill" x="504" y="548" width="148" height="60" rx="8"/>
