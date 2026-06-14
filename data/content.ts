@@ -99,7 +99,7 @@ export const jobs: Job[] = [
     bullets: [
       "Forward-deployed engineer for Mercedes-Benz, BMW, and Ford, converting 3+ POCs into long-term enterprise deployments.",
       "Built high-performance backend services in Spring Boot and FastAPI handling 10M+ API requests annually.",
-      "Designed a global hardware-management platform supporting 1,000+ devices across regions.",
+      "Designed a centralized hardware-management platform (Python/FastAPI) for 1,000+ ECUs across EU, US, APAC, and ASIA — with staged OTA rollouts, parallel test-campaign execution, async telemetry ingestion, and Artifactory-backed result publishing.",
       "Integrated Kafka async messaging across 5+ microservices for higher throughput and fault tolerance.",
       "Optimized secure access via Apache Guacamole, reducing login latency by 85%.",
     ],
@@ -162,13 +162,14 @@ export const projects: Project[] = [
     ],
   },
   {
-    kind: "Enterprise Platform",
-    title: "Global Hardware Management",
+    kind: "Enterprise Platform · IoT at Scale",
+    title: "Global Hardware Manager",
     description:
-      "A multi-region platform managing 1,000+ hardware devices for Mercedes-Benz, BMW, and Ford — covering provisioning, monitoring, and secure remote access through an optimized Apache Guacamole workflow.",
-    metrics: ["1,000+ devices", "multi-region", "85% lower login latency"],
-    tech: ["Spring Boot", "FastAPI", "Kafka", "Apache Guacamole"],
-    context: "Enterprise · KPIT",
+      "A centralized device-management platform — think AWS IoT for automotive HIL — built entirely in Python/FastAPI. The control plane exposes a device registry, live health monitoring, staged OTA rollouts (canary → fleet with health-gated promotion), and a parallel test-campaign engine. Lightweight HIL agents run on desktop machines wired to real ECUs across EU, US, APAC, and ASIA. Devices stream telemetry asynchronously via async FastAPI I/O; test results are persisted to PostgreSQL and published as reports to Artifactory (S3/Nexus). Redis caches registry and health-state lookups to keep the real-time dashboard responsive under 1,000+ concurrent device streams. Secure remote access to hardware nodes is routed through Apache Guacamole — latency cut 85% after connection-pool optimization.",
+    metrics: ["1,000+ devices", "4-region fleet", "85% lower access latency"],
+    tech: ["Python", "FastAPI", "PostgreSQL", "Redis", "Kafka", "S3 · Nexus", "Apache Guacamole", "WebSocket"],
+    context: "Enterprise · KPIT · Mercedes-Benz · BMW · Ford",
+    media: "/hardware-manager-flow.svg",
     diagramLabel: "Multi-region platform",
     diagram: [
       { nodes: [{ label: "1,000+ Devices" }] },
